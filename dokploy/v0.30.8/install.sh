@@ -99,7 +99,7 @@ install_dokploy() {
         sleep 5
     fi
 
-    docker swarm leave --force 2>/dev/null
+    docker swarm leave --force 2>/dev/null || true
 
     get_ip() {
         local ip=""
@@ -156,7 +156,7 @@ install_dokploy() {
         exit 1
     fi
 
-    docker network rm -f dokploy-network 2>/dev/null
+    docker network rm -f dokploy-network 2>/dev/null || true
     docker network create --driver overlay --attachable dokploy-network
 
     mkdir -p /etc/dokploy
