@@ -75,6 +75,17 @@ network_exists dokploy-network    && FOUND_NETWORK=1
 { secret_exists dokploy_postgres_password || secret_exists dokploy_auth_secret; } && FOUND_SECRETS=1
 [ -d /etc/dokploy ]               && FOUND_CONFIG=1
 
+# When the script is piped (curl | bash), stdin is the script itself, so
+# reading from stdin returns EOF immediately. Interactive prompts must read
+# from the terminal instead.
+if [ -t 0 ]; then
+    INPUT_SRC=/dev/stdin
+elif [ -c /dev/tty ]; then
+    INPUT_SRC=/dev/tty
+else
+    die "No terminal available for interactive input."
+fi
+
 # ------------------------------------------------------------- the menu -----
 draw_menu() {
     clear
@@ -118,7 +129,7 @@ if [ "${WANT[app]}" = 0 ] && [ "${WANT[db]}" = 0 ] && [ "${WANT[traefik]}" = 0 ]
 
     while true; do
         draw_menu
-        read -rp "Enter numbers (space separated), 'a' for all, 'q' to quit: " input
+        read -rp "Enter numbers (space separated), 'a' for all, 'q' to quit: " input < "$INPUT_SRC"
         input=$(echo "$input" | tr 'A-Z' 'a-z')
 
         [ "$input" = "q" ] && { log "Aborted, nothing changed."; exit 0; }
@@ -143,7 +154,7 @@ if [ "${WANT[app]}" = 0 ] && [ "${WANT[db]}" = 0 ] && [ "${WANT[traefik]}" = 0 ]
         if [ "$valid" = 0 ] || [ "$selected" = 0 ]; then
             [ "$selected" = 0 ] && warn "Nothing selected — pick at least one option."
             warn "Press Enter to continue..."
-            read -r
+            read -r < "$INPUT_SRC"
             continue
         fi
         break
@@ -166,7 +177,7 @@ if [ "${WANT[docker]}" = 1 ]; then
 fi
 
 printf "\n"
-read -rp "Type 'yes' to confirm: " confirm
+read -rp "Type 'yes' to confirm: " confirm < "$INPUT_SRC"
 [ "$confirm" = "yes" ] || { log "Aborted, nothing changed."; exit 0; }
 
 run() {
