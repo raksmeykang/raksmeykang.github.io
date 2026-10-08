@@ -21,8 +21,8 @@ detect_version() {
         esac
 
         if [ -z "$version" ]; then
-            echo "Warning: Could not detect latest version, using fallback v0.30.2" >&2
-            version="v0.30.2"
+            echo "Warning: Could not detect latest version, using fallback v0.30.8" >&2
+            version="v0.30.8"
         else
             echo "Latest version detected: $version" >&2
         fi
