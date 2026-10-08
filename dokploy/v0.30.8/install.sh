@@ -2,7 +2,6 @@
 
 set -e
 
-DOCKER_VERSION="28.5.0"
 
 detect_version() {
     local version="${DOKPLOY_VERSION:-v0.30.8}"
@@ -85,7 +84,7 @@ install_dokploy() {
     if command_exists docker; then
         echo "Docker already installed"
     else
-        curl -sSL https://get.docker.com | sh -s -- --version $DOCKER_VERSION
+        curl -sSL https://get.docker.com | sh
         if command_exists apt-mark; then
             apt-mark hold docker-ce docker-ce-cli docker-ce-rootless-extras
         fi
