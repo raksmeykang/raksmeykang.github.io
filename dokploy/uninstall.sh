@@ -125,21 +125,28 @@ if [ "${WANT[app]}" = 0 ] && [ "${WANT[db]}" = 0 ] && [ "${WANT[traefik]}" = 0 ]
         [ "$input" = "a" ] && { for k in "${!WANT[@]}"; do WANT[$k]=1; done; break; }
 
         valid=1
+        selected=0
         for tok in $input; do
             case "$tok" in
-                1) WANT[app]=1 ;;
-                2) WANT[db]=1 ;;
-                3) WANT[traefik]=1 ;;
-                4) WANT[swarm]=1 ;;
-                5) WANT[network]=1 ;;
-                6) WANT[secrets]=1 ;;
-                7) WANT[config]=1 ;;
-                8) WANT[docker]=1 ;;
+                1) WANT[app]=1; selected=1 ;;
+                2) WANT[db]=1; selected=1 ;;
+                3) WANT[traefik]=1; selected=1 ;;
+                4) WANT[swarm]=1; selected=1 ;;
+                5) WANT[network]=1; selected=1 ;;
+                6) WANT[secrets]=1; selected=1 ;;
+                7) WANT[config]=1; selected=1 ;;
+                8) WANT[docker]=1; selected=1 ;;
                 *) warn "Ignoring unknown option: $tok"; valid=0 ;;
             esac
         done
-        [ "$valid" = 1 ] && break
-        warn "Press Enter to continue..."; read -r
+
+        if [ "$valid" = 0 ] || [ "$selected" = 0 ]; then
+            [ "$selected" = 0 ] && warn "Nothing selected — pick at least one option."
+            warn "Press Enter to continue..."
+            read -r
+            continue
+        fi
+        break
     done
 fi
 
